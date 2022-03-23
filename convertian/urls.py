@@ -15,7 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from. import views
+from . import views
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,4 +25,6 @@ urlpatterns = [
     path('pdftodoc/',views.pdftodoc,name='pdftodoc'),
     path('doctopdf/',views.doctopdf,name='doctopdf'),
     path('compressimage/',views.compressimage,name='compressimage'),
+    path('signin/',views.signin,name='signin'),
+    path('postsign/',views.postsign,name='signin'),
 ]
