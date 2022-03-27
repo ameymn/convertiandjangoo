@@ -66,19 +66,18 @@
 			</div>
 		</div>
 	</nav>
-	<form action="imgtopdfprocess" method="post" enctype="multipart/form-data">
+	<form  method="POST" enctype="multipart/form-data">
+		{% csrf_token%}
 	<div>
   <label for="formFileLg" class="form-label">CHOSE IMAGE </label>
-  <input type="file" name="file" class="form-control form-control-lg" id="formFileLg"  >
+  <input type="file" name="upload" class="form-control form-control-lg" accept="pdf/*"  >
   </div>
-  <div class="external-repos">
-	<div class="icon google-icon brand-border-on-hover js-google-picker-btn" title="Select file from Google Drive"></div>
-	<div class="icon dropbox-icon brand-border-on-hover js-dropbox-choose-btn" title="Select file from Dropbox"></div>
-	<div class="icon url-icon brand-border-on-hover js-url-input-btn" title="Load file from URL"></div>
-	</div>
+  <br>
+  
 	<div class="btn-block">
-          <button class="btn btn-outline-dark btn-lg">CONVERT</button>
+		<button class="btn btn-outline-dark btn-lg">CONVERT</button>
         </div>
 	</form>
+
 </body>
 </html>
