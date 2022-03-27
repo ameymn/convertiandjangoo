@@ -16,15 +16,20 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from . import views
+from .views import home
+from django.conf.urls.static import static
+from django.conf import settings
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',views.index,name='index'),
+    path('',home),
+    path('home/',views.index,name='index'),
     path('imagetopdf/',views.imagetopdf,name='imagetopdf'),
     path('pdftodoc/',views.pdftodoc,name='pdftodoc'),
     path('doctopdf/',views.doctopdf,name='doctopdf'),
     path('compressimage/',views.compressimage,name='compressimage'),
     path('signin/',views.signin,name='signin'),
     path('postsign/',views.postsign,name='signin'),
-]
+    #path("upload", views.upload, name="upload"),
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
