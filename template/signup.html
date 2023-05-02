@@ -36,10 +36,13 @@
 <style type="text/css">
 body, body {
 	background:
-		url(https://www.pixelstalk.net/wp-content/uploads/2016/08/Black-Wallpaper-HD-1920x1080-Free-Download.jpg)
+		url(https://www.pixelstalk.net/wp-content/uploads/2016/08/Best-Black-Backgrounds-Free-Download.jpg)
 		no-repeat center center #505050;
 }
-
+.required:after {
+    content:" *";
+    color: red;
+  }
 .signin {
 	background-color: grey;
 	font-family: 'Montserrat', sans-serif;
@@ -51,7 +54,7 @@ body, body {
 .login {
 	opacity: 1;
 	position: relative;
-	height: 460px;
+	height: 469px;
 	width: 405px;
 	margin: auto;
 	padding: 60px 60px;
@@ -60,7 +63,7 @@ body, body {
 }
 
 form {
-	padding-top: 80px;
+	padding-top: 20px;
 }
 
 .active {
@@ -220,13 +223,19 @@ a {
 		<h2 class="active">sign Up</h2>
 		<form action="/postsignup/"  method="post">
 			{% csrf_token %}
+			<label class="required" style="color:#FFF;font-size: 14px">EMAIL:</label>
+			<input type="email" class="text"  name="email" required minlength="7"> 
 
-
-
-			<input type="email" class="text"  name="email" required minlength="7"> <span>email</span>
-
-			<br> <br> <input type="password" class="text"  required minlength="8"
-				name="password"> <span>password</span> <br>
+			<br>
+			<!--<label class="required" style="color:#FFF;font-size: 14px">USERNAME:</label>
+			 <input type="text" class="text"  required minlength="8"
+			name="username"> <br>-->
+			 <label class="required" style="color:#FFF;font-size: 14px">PASSWORD:</label>
+			  <input type="password" class="text"  required minlength="8"
+				name="password">  <br>
+				<label class="required" style="color:#FFF;font-size: 14px">CONFIRM PASSWORD:</label>
+				<input type="password" class="text"  required minlength="8"
+			name="rpassword">  <br>
 
 			<button class="signin">Sign Up</button>
 		</form>

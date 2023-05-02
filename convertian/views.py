@@ -1,5 +1,6 @@
 #file the i have created
 import imp
+import multiprocessing
 from pickletools import optimize
 from typing import ParamSpec
 import pyrebase
@@ -9,6 +10,8 @@ import aspose.words as aw
 import PIL
 import os
 import time
+from pdf2docx import Converter
+from docx2pdf import convert
 from forex_python.converter import CurrencyRates
 from forex_python.bitcoin import BtcConverter
 import comtypes.client
@@ -17,13 +20,13 @@ from django.http import HttpResponse
 from django.shortcuts import render,redirect
 from django.core.files.storage import FileSystemStorage, default_storage
 config={
-    'apiKey': "AIzaSyDmEH8jXNgKHkglaglV7KRjM0o7MRasabs",
-    'authDomain': "convert-fbfde.firebaseapp.com",
-    'projectId': "convert-fbfde",
-    'storageBucket': "convert-fbfde.appspot.com",
-    'messagingSenderId': "238785399466",
-    'appId': "1:238785399466:web:aff38fb167e404c1995ed3",
-    'measurementId': "G-56EPEXLQLW",
+    'apiKey': "XXXXXXX",
+    'authDomain': "XXXXXXX",
+    'projectId': "XXXXXXX",
+    'storageBucket': "XXXXXXX",
+    'messagingSenderId': "XXXXXXX",
+    'appId': "XXXXXXX",
+    'measurementId': "XXXXXXX",
     'databaseURL': ""
 }
 firebase=pyrebase.initialize_app(config)
@@ -36,16 +39,23 @@ def signup(request):
 def postsign(request):
      email=request.POST.get('email')
      passw=request.POST.get('password')
+     passwr=request.POST.get('rpassword')
+     username=request.POST.get('username')
      user=auth.sign_in_with_email_and_password(email,passw)
-     params={'e':email}
+     if "." in email:
+          z=email.split(".")
+     print(z[0])
+     params={'e':z[0]}
      return render(request,'welcome.html',params)
 def postsignup(request):
      email=request.POST.get('email')
-     passw=request.POST.get('password')
-     print(email)
-     print(passw)
+     passw=request.POST.get('password') 
      user=auth.create_user_with_email_and_password(email,passw)
-     return render(request,'welcome.html')
+     if "." in email:
+          z=email.split(".")
+     print(z[0])
+     params={'e':z[0]}
+     return render(request,'welcome.html',params)
 def index(request):
     return redirect("http://127.0.0.1:8000/")
 #def upload(request):
@@ -791,9 +801,12 @@ def imagetopdf(request):
                image=image.convert("RGB")
           output="results\\out.pdf"   
           image.save(output,"PDF",resoultion=300.0)    
-     path_on_cloud="images\\comp.jpg"
-     path_on_project="media\\comp.jpg"
+     path_on_cloud="images\\comp.pdf"
+     path_on_project="results\\out.pdf"
      storage.child(path_on_cloud).put(path_on_project)  
+     pdf_url=storage.child(path_on_cloud).get_url(None)
+     print(pdf_url)
+     params={"down":pdf_url}
           #pdf=fitz.open(file_url)
           #page=pdf.loadPage(0)
           #pix=page.getPixmap()
@@ -808,21 +821,24 @@ def imagetopdf(request):
           
           #file.close()
   
-     return render(request,'imagetopdf.html')
+     return render(request,'imagetopdfsuccess.html',params)
 
-
-     
-     return render(request,'imagetopdf.html')
 def pdftodoc(request):
      if request.method=="POST":
           pdf_file=request.FILES['pdf']
-          print(pdf_file.name)
-          print(pdf_file.size)
-          file_url=pdf_file.file
-          doc = aw.Document(file_url)
-          doc.save("pdf-to-word.docx")
-
-     return render(request,'pdftodoc.html')
+          print(pdf_file)
+          file=pdf_file.file
+          word_file="demo.docx"
+          cv=Converter(file)
+          cv.convert(word_file,multiprocessing=True)
+          cv.close()
+     path_on_cloud="word\\documents.docx"
+     path_on_project="demo.docx"
+     storage.child(path_on_cloud).put(path_on_project)
+     doc_url=storage.child(path_on_cloud).get_url(None)
+     
+     params={"down":doc_url}
+     return render(request,'pdftodoc.html',params)
 
 def imagetopdfsuccess(request):
      return render(request,'imagetopdf/imagetopdfsuccess.html')
@@ -830,17 +846,28 @@ def imagetopdfsuccess(request):
 def doctopdf(request):
      if request.method=="POST":
           word_file=request.FILES['doc']
-          file_url=word_file.file
-          doc = aw.Document(file_url)
-          doc.save("PDF.pdf")
-
-     return render(request,'doctopdf.html')
+          fs = FileSystemStorage()
+          file_name=fs.save(word_file.name,word_file)
+          uploaded_file_path=fs.path(file_name)
+          print("path is:----",uploaded_file_path)
+          convert(uploaded_file_path)
+          convert(uploaded_file_path,"output.pdf")
+     path_on_cloud="pdf\\pdfs.pdf"
+     path_on_project="output.pdf"
+     storage.child(path_on_cloud).put(path_on_project)
+     pdf_url=storage.child(path_on_cloud).get_url(None)
+     params={"down":pdf_url}
+     return render(request,'doctopdf.html',params)
 def home(request):
      return render(request,'index.html')
+
 
 def compressimage(request):
      if request.method=="POST":
           imgto_c=request.FILES['imgc']
+          value_slider=request.POST.get('sslider')
+          value=100-int(value_slider)
+          print(value_slider)
           print(imgto_c.name)
           Image = PIL.Image.open(imgto_c)
           print(Image.size)
@@ -848,18 +875,22 @@ def compressimage(request):
                Image=Image.convert("RGB")
                Image.save("media\\input.jpg")
                file_name="media\\comp.jpg"
-               Image.save(file_name,optimize=True,quality=1)
+               Image.save(file_name,optimize=True,quality=value)
           else:
                Image.save("media\\comp.jpg")
                file_name="media\\comp.jpg"
-               Image.save(file_name,optimize=True,quality=50)
+               Image.save(file_name,optimize=True,quality=value)
 
      path_on_cloud="images\\comp.jpg"
      path_on_project="media\\comp.jpg"
      storage.child(path_on_cloud).put(path_on_project)
+     img_url=storage.child(path_on_cloud).get_url(None)
+     print(img_url)
+     
           #print(imgto_c.size)
           #if picture.mode=="RGBA":
                #picture=picture.convert("RGB")
             
                #picture.save("C:\\Users\\91738\\Desktop\\convertionj\\convertian\\results\\comp.jpg",optimize=True,quality=30) 
-     return render(request,'compressimage.html')
+     params={"down":img_url}
+     return render(request,'compressimage.html',params)

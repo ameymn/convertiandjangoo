@@ -19,6 +19,7 @@ from . import views
 from .views import home
 from django.conf.urls.static import static
 from django.conf import settings
+from django.views.static import serve
 
 
 urlpatterns = [
@@ -54,5 +55,7 @@ urlpatterns = [
     path('postsign/',views.postsign,name='signin'),
     path('postsignup/',views.postsignup,name='postsignup'),
     path('imagetopdfsuccess/',views.imagetopdfsuccess,name='imagetopdfsuccess'),
+    #url(r'^media/(?P<path>.*)$', serve,{'document_root':       settings.MEDIA_ROOT}), 
+    #url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}), 
     #path("upload", views.upload, name="upload"),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
